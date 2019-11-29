@@ -1,26 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import API, { graphqlOperation } from '@aws-amplify/api'
+import PubSub from '@aws-amplify/pubsub'
+
+import { createTodo } from './graphql/mutations'
+
+import awsconfig from './aws-exports'
+
+import TodoForm from './components/todo-form'
+
+import './App.css'
+
+API.configure(awsconfig)
+PubSub.configure(awsconfig)
+
+async function createNewTodo (
+  todo = { name: 'Use AWS AppSync', description: 'Realtime and Offline' }
+) {
+  await API.graphql(graphqlOperation(createTodo, { input: todo }))
 }
 
-export default App;
+function App () {
+  return (
+    <div className='App'>
+      <TodoForm onSubmit={createNewTodo} />
+    </div>
+  )
+}
+
+export default App
